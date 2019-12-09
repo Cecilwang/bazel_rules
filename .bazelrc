@@ -1,0 +1,92 @@
+# Speed Up build
+common --experimental_multi_threaded_digest
+
+# C/C++
+build --cxxopt=-std=c++11
+build --host_cxxopt=-std=c++11
+build --copt=-O3
+build --per_file_copt=//one:.*\.cc@-Wall,-Werror
+build --per_file_copt=external/.*@-w
+
+# Release
+build:release --copt=-fvisibility=hidden
+
+# Instruction Set Architecture
+build:isa_arm-neon --copt=-D__ARM_NEON
+build:isa_arm-neon --copt=-D__ARM_NEON__
+build:isa_arm-neon --copt=-mfpu=neon
+build:isa_arm-neon --copt=-mfloat-abi=softfp
+
+build:isa_aarch64-neon --copt=-D__ARM_NEON
+build:isa_aarch64-neon --copt=-D__ARM_NEON__
+
+build:isa_sse4 --copt=-msse2
+build:isa_sse4 --copt=-msse3
+build:isa_sse4 --copt=-msse4
+
+build:isa_avx --config=isa_sse4
+build:isa_avx --copt=-mavx
+
+build:isa_avx2 --config=isa_avx
+build:isa_avx2 --copt=-mavx2
+build:isa_avx2 --copt=-mfma
+
+build:isa_avx512 --config=isa_avx2
+#build:isa_avx512 --copt=-march=skylake-avx512
+#build:isa_avx512 --copt=-mprefer-vector-width=512
+build:isa_avx512 --copt=-mavx512cd
+build:isa_avx512 --copt=-mavx512vl
+build:isa_avx512 --copt=-mavx512dq
+build:isa_avx512 --copt=-mavx512bw
+build:isa_avx512 --copt=-mavx512ifma
+build:isa_avx512 --copt=-mavx512vbmi
+
+# Platforms
+common --incompatible_enable_cc_toolchain_resolution # enable platforms
+
+build:linux_avx2 --config=isa_avx2
+build:linux_avx2 --platform_suffix=-linux_avx2
+
+build:linux_avx512 --config=isa_avx512
+build:linux_avx512 --platform_suffix=-linux_avx512
+
+build:android --force_pic
+build:android --linkopt=-ldl
+build:android --linkopt=-lm
+
+build:android_arm --config=android
+build:android_arm --platforms=//platforms:android_arm
+build:android_arm --config=isa_arm-neon
+build:android_arm --platform_suffix=-android_arm
+
+build:android_aarch64 --config=android
+build:android_aarch64 --platforms=//platforms:android_aarch64
+build:android_aarch64 --config=isa_aarch64-neon
+build:android_aarch64 --platform_suffix=-android_aarch64
+
+build:linaro --run_under="qemu-aarch64 -E LD_LIBRARY_PATH=/linaro/aarch64-linux-gnu/libc/lib"
+
+# Test
+test --test_output=errors
+
+# Enable heap check for test
+test --test_env=HEAPCHECK=normal
+test --test_env=PPROF_PATH=external/third_party/gperftools/bin/pprof
+
+test:disable_test_heap_check --test_env=HEAPCHECK=
+test:disable_test_heap_check --test_env=PPROF_PATH=
+
+# Cpplint
+# modified from
+#   https://github.com/ApolloAuto/apollo/blob/d605ff43e65ab4943622dd2fba33d35d29f37e7d/tools/bazel.rc#L21
+# To enable the lint test, the BUILD *must* load the cpplint.bzl by having
+# 'load("@common_bazel_rules//cpplint:cpplint.bzl", "cpplint")' at the beginning
+# and 'cpplint()' at the end.
+# Note that you have to put a file 'CPPLINT.cfg' at the %WORKSPACE% direcotry.
+test:cpplint --test_tag_filters=cpplint
+test:cpplint --build_tests_only
+
+# Coverage
+coverage --combined_report=lcov
+coverage --coverage_report_generator=@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main
+coverage --experimental_cc_coverage
