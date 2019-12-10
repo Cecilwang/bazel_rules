@@ -64,7 +64,12 @@ build:android_aarch64 --platforms=//platforms:android_aarch64
 build:android_aarch64 --config=isa_aarch64-neon
 build:android_aarch64 --platform_suffix=-android_aarch64
 
-build:linaro --run_under="qemu-aarch64 -E LD_LIBRARY_PATH=/linaro/aarch64-linux-gnu/libc/lib"
+run:linaro --run_under="qemu-aarch64 -E LD_LIBRARY_PATH=/linaro/aarch64-linux-gnu/libc/lib"
+
+run:linaro_aarch64 --config=linaro
+build:linaro_aarch64 --platforms=//platforms:linux_aarch64
+build:linaro_aarch64 --config=isa_aarch64-neon
+build:linaro_aarch64 --platform_suffix=-linaro_aarch64
 
 # Test
 test --test_output=errors

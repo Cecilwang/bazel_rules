@@ -24,6 +24,14 @@ platform(
 )
 
 platform(
+    name = "linux_aarch64",
+    constraint_values = [
+        "@platforms//cpu:aarch64",
+    ],
+    parents = [":linux"],
+)
+
+platform(
     name = "android",
     constraint_values = [
         "@platforms//os:android",
