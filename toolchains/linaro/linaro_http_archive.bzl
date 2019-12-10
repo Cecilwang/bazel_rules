@@ -12,25 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-def _get_cxx_inc_directories(ctx, cc):
-    """Compute the list of default C++ include directories."""
-    result = ctx.execute([cc, "-E", "-xc++", "-", "-v"])
-    index1 = result.stderr.find("#include <...>")
-    if index1 == -1:
-        return []
-    index1 = result.stderr.find("\n", index1)
-    if index1 == -1:
-        return []
-    index2 = result.stderr.rfind("\n ")
-    if index2 == -1 or index2 < index1:
-        return []
-    index2 = result.stderr.find("\n", index2 + 1)
-    if index2 == -1:
-        inc_dirs = result.stderr[index1 + 1:]
-    else:
-        inc_dirs = result.stderr[index1 + 1:index2].strip()
-    return [ctx.path(p.strip()) for p in inc_dirs.split("\n")]
-
 def _linaro_http_archive_impl(ctx):
     cpu, os, compiler = ctx.attr.triple.split("-")
 
@@ -54,14 +35,6 @@ def _linaro_http_archive_impl(ctx):
         },
     )
 
-    cxx_builtin_include_directories = _get_cxx_inc_directories(
-        ctx,
-        "bin/{}-gcc".format(ctx.attr.triple),
-    )
-    cxx_builtin_include_directories = ["\"{}\"".format(x) for x in cxx_builtin_include_directories]
-    cxx_builtin_include_directories = ", ".join(cxx_builtin_include_directories)
-    cxx_builtin_include_directories = "cxx_builtin_include_directories = [{}]".format(cxx_builtin_include_directories)
-
     ctx.template(
         "linaro_cc_toolchain_config.bzl",
         ctx.attr.crosstool_tpl,
@@ -71,7 +44,6 @@ def _linaro_http_archive_impl(ctx):
             "%{cpu}": cpu,
             "%{compiler}": compiler,
             "%{gcc_version}": ctx.attr.gcc_version,
-            "%{cxx_builtin_include_directories}": cxx_builtin_include_directories,
         },
     )
 

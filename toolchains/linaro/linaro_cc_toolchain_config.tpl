@@ -281,7 +281,7 @@ def _impl(ctx):
         unfiltered_compile_flags_feature,
     ]
 
-    %{cxx_builtin_include_directories}
+    cxx_builtin_include_directories = []
 
     artifact_name_patterns = []
 
