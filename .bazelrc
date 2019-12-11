@@ -1,5 +1,5 @@
 # Speed Up build
-common --experimental_multi_threaded_digest
+build --experimental_multi_threaded_digest
 
 # C/C++
 build --cxxopt=-std=c++11
@@ -42,7 +42,7 @@ build:isa_avx512 --copt=-mavx512ifma
 build:isa_avx512 --copt=-mavx512vbmi
 
 # Platforms
-common --incompatible_enable_cc_toolchain_resolution # enable platforms
+build --incompatible_enable_cc_toolchain_resolution # enable platforms
 
 build:linux_avx2 --config=isa_avx2
 build:linux_avx2 --platform_suffix=-linux_avx2
