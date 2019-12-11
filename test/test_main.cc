@@ -15,4 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "platforms/platforms.h"
+
+#if PLATFORM(NEON)
+#include <arm_neon.h>
+#endif
+
 int main() { std::cout << "Hello World!" << std::endl; }

@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//cpplint:cpplint.bzl", "cpplint")
+
 platform(
     name = "linux",
     constraint_values = [
@@ -67,3 +69,10 @@ platform(
         "@platforms//os:macos",
     ],
 )
+
+cc_library(
+    name = "platforms",
+    hdrs = ["platforms.h"],
+)
+
+cpplint()
